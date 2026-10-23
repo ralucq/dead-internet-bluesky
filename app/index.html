@@ -1,0 +1,62 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Is anyone there? Bluesky bot check</title>
+<meta name="description" content="Compares a Bluesky account with declared bots and ordinary accounts. Part of a master's thesis on the Dead Internet Theory.">
+<style>
+:root{--bg:#f6f7f9;--card:#fff;--ink:#16202b;--mute:#5d6b7a;--line:#dfe4ea;--accent:#2a5bd7;
+--b0:#2f8f6b;--b1:#5aa07a;--b2:#8aa05a;--b3:#c1a13b;--b4:#d98a2b;--b5:#d1552f;--b6:#b3263b}
+@media (prefers-color-scheme:dark){:root{--bg:#10151b;--card:#18202a;--ink:#e8edf2;--mute:#9aa8b6;--line:#2a3542;--accent:#7aa2ff;
+--b0:#4cc08f;--b1:#79c196;--b2:#a9c279;--b3:#dcc055;--b4:#eba24a;--b5:#ee7650;--b6:#e5566c}}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.55 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif}
+main{max-width:760px;margin:0 auto;padding:32px 16px 64px}
+h1{font-size:1.7rem;line-height:1.25;margin:0 0 6px}
+.sub{color:var(--mute);margin:0 0 24px}
+form{display:flex;gap:8px;flex-wrap:wrap}
+input{flex:1 1 260px;font:inherit;padding:12px 14px;border:1px solid var(--line);border-radius:10px;background:var(--card);color:var(--ink)}
+button{font:inherit;font-weight:600;padding:12px 20px;border:0;border-radius:10px;background:var(--accent);color:#fff;cursor:pointer}
+button:disabled{opacity:.6;cursor:wait}
+.card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:20px;margin-top:18px}
+.who{display:flex;gap:12px;align-items:center;margin-bottom:6px}
+.who img{width:48px;height:48px;border-radius:50%;background:var(--line)}
+.who b{display:block}.who span{color:var(--mute);font-size:.9rem}
+.verdict{border-left:6px solid var(--c);padding:6px 0 6px 14px;margin:14px 0}
+.verdict .big{font-size:1.5rem;font-weight:700;color:var(--c)}
+.scale{display:flex;gap:3px;margin:14px 0 4px}
+.scale i{flex:1;height:10px;border-radius:3px;background:var(--line)}
+.scale i.on{outline:2px solid var(--ink);outline-offset:1px}
+.mute{color:var(--mute);font-size:.92rem}
+h2{font-size:1.05rem;margin:22px 0 8px}
+ul.r{list-style:none;padding:0;margin:0}
+ul.r li{padding:10px 0;border-top:1px solid var(--line)}
+ul.r li:first-child{border-top:0}
+.nums{color:var(--mute);font-size:.88rem}
+.note{background:color-mix(in srgb,var(--accent) 10%,transparent);border-radius:10px;padding:12px 14px;margin-top:14px;font-size:.93rem}
+.err{color:var(--b6)}
+details{margin-top:18px}summary{cursor:pointer;font-weight:600}
+footer{color:var(--mute);font-size:.85rem;margin-top:28px}
+a{color:var(--accent)}
+</style>
+</head>
+<body>
+<main>
+  <h1>Is anyone there?</h1>
+  <p class="sub">Enter a Bluesky handle. The page compares the account with declared bots and ordinary accounts from a study on the Dead Internet Theory.</p>
+  <form id="f">
+    <input id="h" placeholder="name.bsky.social" autocomplete="off" spellcheck="false" aria-label="Bluesky handle">
+    <button id="go">Check</button>
+  </form>
+  <div id="out" aria-live="polite"></div>
+  <details>
+    <summary>How this works, and what it cannot tell you</summary>
+    <p class="mute">The page reads the account's public profile, its latest 100 posts, replies and reposts, and up to 100 followers and 100 followed accounts. It turns them into 37 measurements (timing, repetition, replies, followers and so on) and compares them with 598 accounts that call themselves bots and 580 ordinary accounts. Everything is computed in your browser. Nothing is stored and nothing is sent anywhere except to Bluesky's public API.</p>
+    <p class="mute">The result is a level of evidence, not a verdict. It measures how much the account looks like the declared bots of the study, which are mostly scheduled feed accounts (news, weather, alerts). It cannot see AI-driven or fake-person accounts that behave like people and do not say what they are. An ordinary account can also look like a bot (for example one that posts only links on a schedule). Never use the result to accuse a person.</p>
+  </details>
+  <footer>Master's thesis: Dead Internet Theory, an analysis of behavior and social connections among Bluesky accounts.</footer>
+</main>
+<script type="module" src="app.js"></script>
+</body>
+</html>

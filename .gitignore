@@ -1,0 +1,7 @@
+# Collected data of ordinary people (public, but not to be published: see ethics note in the methods log)
+data/
+# Editor and system files
+.idea/
+node_modules/
+.DS_Store
+*.zip
