@@ -2,6 +2,8 @@
 data/
 # Methods log names accounts: keep it local (it is also saved in the Claude project)
 notes/
+# Bluesky credentials (never commit)
+.env
 # Editor and system files
 .idea/
 node_modules/
