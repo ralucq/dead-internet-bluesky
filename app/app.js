@@ -86,13 +86,36 @@ function render(profile, items, graph, res) {
   notes.push(lowBand
     ? "<b>Important:</b> this measures scheduled, repetitive, one-way posting, the way declared feed bots behave. It cannot see fake-person or AI-run accounts that post and interact like people (for example accounts with stolen or generated photos). A low result does not mean the account is a real person."
     : "The score compares this account with declared bots (mostly scheduled feed accounts). It cannot see AI-driven accounts that behave like people.");
+  const avatarUrl = profile.avatar ? encodeURIComponent(profile.avatar) : null;
+  const moreChecks = avatarUrl ? `
+    <div class="more-checks">
+      <div class="more-checks-title">More things you can check</div>
+      <div class="check-row">
+        <span class="check-row-label">Reverse image search</span>
+        <div class="check-links">
+          <a href="https://lens.google.com/uploadbyurl?url=${avatarUrl}" target="_blank" rel="noopener">Google Lens</a>
+          <a href="https://tineye.com/search?url=${avatarUrl}" target="_blank" rel="noopener">TinEye</a>
+          <a href="https://yandex.com/images/search?source=collections&url=${avatarUrl}" target="_blank" rel="noopener">Yandex</a>
+        </div>
+      </div>
+      <div class="check-row">
+        <span class="check-row-label">Is the photo AI-generated?</span>
+        <div class="check-links">
+          <a href="https://aiornot.com" target="_blank" rel="noopener">AI or Not</a>
+          <a href="https://illuminarty.ai" target="_blank" rel="noopener">Illuminarty</a>
+          <a href="https://isitai.com/ai-image-detector/" target="_blank" rel="noopener">Is It AI?</a>
+        </div>
+      </div>
+      <div class="check-hint">For the AI-detection sites: right-click the profile photo above &rarr; &ldquo;Copy image address&rdquo; &rarr; paste it on the site.</div>
+    </div>` : "";
   $("out").innerHTML = `<div class="card">
-    <div class="who">${profile.avatar ? `<div class="who-pic"><img src="${esc(profile.avatar)}" alt=""><div class="rev-img-search"><span>Reverse image:</span><a href="https://lens.google.com/uploadbyurl?url=${encodeURIComponent(profile.avatar)}" target="_blank" rel="noopener">Lens</a><a href="https://tineye.com/search?url=${encodeURIComponent(profile.avatar)}" target="_blank" rel="noopener">TinEye</a><a href="https://yandex.com/images/search?source=collections&url=${encodeURIComponent(profile.avatar)}" target="_blank" rel="noopener">Yandex</a></div></div>` : "<img alt=''>"}<div><b>${esc(profile.displayName || profile.handle)}</b><span>@${esc(profile.handle)}</span></div></div>
+    <div class="who"><img src="${profile.avatar ? esc(profile.avatar) : ""}" alt=""><div><b>${esc(profile.displayName || profile.handle)}</b><span>@${esc(profile.handle)}</span></div></div>
     <div class="verdict" style="--c:var(${COLORS[k]})"><div class="big">${esc(title)}</div><div>${esc(text)}</div></div>
     <div class="scale" aria-hidden="true">${model.bands.map((_, i) => `<i class="${i === k ? "on" : ""}" style="background:var(${COLORS[i]})"></i>`).join("")}</div>
     <div class="mute">Score ${res.score.toFixed(0)} of 100 &middot; band &ldquo;${esc(band.name)}&rdquo;. In the study, ${sb} of 100 declared bots and ${sc} of 100 ordinary accounts fell in this band (evidence ratio ${band.ratio.toFixed(band.ratio >= 10 ? 0 : 1)}).</div>
     ${notes.map((n) => `<div class="note">${n}</div>`).join("")}
     ${reasons(res)}
+    ${moreChecks}
   </div>`;
 }
 
