@@ -101,12 +101,12 @@ function render(profile, items, graph, res) {
       <div class="check-row">
         <span class="check-row-label">Is the photo AI-generated?</span>
         <div class="check-links">
-          <a href="https://aiornot.com" target="_blank" rel="noopener">AI or Not</a>
-          <a href="https://illuminarty.ai" target="_blank" rel="noopener">Illuminarty</a>
-          <a href="https://isitai.com/ai-image-detector/" target="_blank" rel="noopener">Is It AI?</a>
+          <a href="https://aiornot.com" target="_blank" rel="noopener" data-copy="${esc(profile.avatar)}">AI or Not</a>
+          <a href="https://illuminarty.ai" target="_blank" rel="noopener" data-copy="${esc(profile.avatar)}">Illuminarty</a>
+          <a href="https://isitai.com/ai-image-detector/" target="_blank" rel="noopener" data-copy="${esc(profile.avatar)}">Is It AI?</a>
         </div>
       </div>
-      <div class="check-hint">For the AI-detection sites: right-click the profile photo above &rarr; &ldquo;Copy image address&rdquo; &rarr; paste it on the site.</div>
+      <div class="check-hint">Clicking an AI-detection link copies the photo URL to your clipboard automatically &mdash; just paste it on the site.</div>
     </div>` : "";
   $("out").innerHTML = `<div class="card">
     <div class="who"><img src="${profile.avatar ? esc(profile.avatar) : ""}" alt=""><div><b>${esc(profile.displayName || profile.handle)}</b><span>@${esc(profile.handle)}</span></div></div>
@@ -124,6 +124,17 @@ function normalize(input) {
   if (h && !h.startsWith("did:") && !h.includes(".")) h += ".bsky.social";
   return h;
 }
+document.addEventListener("click", (e) => {
+  const link = e.target.closest("a[data-copy]");
+  if (!link) return;
+  const url = link.dataset.copy;
+  navigator.clipboard?.writeText(url).then(() => {
+    const orig = link.textContent;
+    link.textContent = "URL copied!";
+    setTimeout(() => { link.textContent = orig; }, 1800);
+  }).catch(() => {});
+});
+
 $("f").addEventListener("submit", async (e) => {
   e.preventDefault();
   if (!model) return;
