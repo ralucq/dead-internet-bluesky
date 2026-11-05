@@ -114,8 +114,8 @@ function render(profile, items, graph, res) {
     <div class="scale" aria-hidden="true">${model.bands.map((_, i) => `<i class="${i === k ? "on" : ""}" style="background:var(${COLORS[i]})"></i>`).join("")}</div>
     <div class="mute">Score ${res.score.toFixed(0)} of 100 &middot; band &ldquo;${esc(band.name)}&rdquo;. In the study, ${sb} of 100 declared bots and ${sc} of 100 ordinary accounts fell in this band (evidence ratio ${band.ratio.toFixed(band.ratio >= 10 ? 0 : 1)}).</div>
     ${notes.map((n) => `<div class="note">${n}</div>`).join("")}
-    ${reasons(res)}
     ${moreChecks}
+    ${reasons(res)}
   </div>`;
 }
 
