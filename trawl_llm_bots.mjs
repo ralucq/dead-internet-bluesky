@@ -18,6 +18,8 @@
 
 import { readFile, writeFile } from "node:fs/promises";
 import { existsSync } from "node:fs";
+import { collectAccount, computeSignals, scoreAccount } from "./app/signals.js";
+import modelData from "./app/model.json" with { type: "json" };
 
 // --- load .env ---
 async function loadEnv() {
@@ -47,9 +49,11 @@ const delayMs        = Number(flag("--delay") ?? 400);
 const extraPhrase    = flag("--phrase");
 const doCollect      = args.includes("--collect");
 
-// LLM "reply guy" phrases: characteristic of ChatGPT/LLM-generated debate comments.
-// Source: poorolive51 Medium article + community observation (Dec 2024 – 2025 wave).
+// LLM "reply guy" phrases: characteristic of ChatGPT/LLM-generated social media posts.
+// Sources: poorolive51 Medium article; community observation (2024–2025 wave);
+//          additional phrases identified by researcher (November 2026).
 const PHRASES = [
+  // --- debate / reply phrases (from poorolive51 article) ---
   "ignores the complexity",
   "oversimplifies the issue",
   "the notion that",
@@ -60,6 +64,20 @@ const PHRASES = [
   "it's more nuanced than",
   "fails to consider",
   "in reality, the situation",
+  // --- filler / structural phrases common in LLM output ---
+  "plays a significant role in",
+  "in today's fast-paced world",
+  "it is important to remember that",
+  "here's the thing nobody talks about",
+  "the truth nobody wants to hear",
+  "significant role in shaping",
+  "delve into",
+  "make no mistake",
+  "speaks volumes",
+  "more people need to hear this",
+  "it cannot be overstated",
+  "at the end of the day",
+  "in today's rapidly evolving",
 ];
 if (extraPhrase) PHRASES.push(extraPhrase);
 
@@ -165,33 +183,53 @@ for (const s of botLikely) {
   console.log();
 }
 
-// --- optionally collect suspects into data/fake_persons.json ---
+// --- optionally collect + score suspects into data/fake_persons.json ---
 if (doCollect && botLikely.length > 0) {
   const OUT = "data/fake_persons.json";
+  const PUB_API = "https://public.api.bsky.app/xrpc";
   let results = [];
   if (existsSync(OUT)) {
     try { results = JSON.parse(await readFile(OUT, "utf8")); } catch {}
   }
   const done = new Set(results.map((r) => r.handle));
-  let added = 0;
+  let added = 0, failed = 0;
+
+  console.log("\nScoring and saving suspects...\n");
   for (const s of botLikely) {
-    if (done.has(s.handle)) continue;
-    results.push({
-      handle: s.handle,
-      did: s.did,
-      collectedAt: new Date().toISOString(),
-      reason: `LLM reply-guy bot: matched ${s.matchCount} phrases (${s.matchedPhrases.join(", ")}); min posting gap ${s.minGapMinutes} min`,
-      source: "trawl_llm_bots.mjs (Method 1 from poorolive51 Medium article)",
-      displayName: s.displayName || null,
-      description: s.description || null,
-      score: null,
-      band: null,
-      note: "Score not computed — run collect_fake_persons.mjs --force on this handle to score it",
-    });
+    if (done.has(s.handle)) { console.log(`skip  ${s.handle} (already collected)`); continue; }
+    process.stdout.write(`score ${s.handle} ... `);
+    try {
+      const { profile, items, graph } = await collectAccount(s.handle, { api: PUB_API });
+      const signals = computeSignals(profile, items, graph);
+      const result  = scoreAccount(modelData, signals);
+      results.push({
+        handle: s.handle,
+        did: s.did,
+        collectedAt: new Date().toISOString(),
+        reason: `LLM phrase bot: matched ${s.matchCount} phrase(s) — ${s.matchedPhrases.join("; ")}`,
+        source: "trawl_llm_bots.mjs",
+        displayName: profile.displayName ?? null,
+        description: profile.description ?? null,
+        avatar: profile.avatar ?? null,
+        createdAt: profile.createdAt ?? null,
+        followersCount: profile.followersCount ?? null,
+        followsCount: profile.followsCount ?? null,
+        postsCount: profile.postsCount ?? null,
+        score: Math.round(result.score),
+        band: result.band.name,
+        missing: result.missing,
+        signals: result.parts.map((p) => ({ signal: p.signal, value: p.value, contribution: +p.contribution.toFixed(4) })),
+        trawl: { matchedPhrases: s.matchedPhrases, matchCount: s.matchCount, minGapMinutes: s.minGapMinutes, medianGapMinutes: s.medianGapMinutes ?? null },
+      });
+      console.log(`score ${Math.round(result.score)} (${result.band.name})  missing ${result.missing.length}/${modelData.signals.length}`);
+      added++;
+    } catch (err) {
+      console.log(`ERROR: ${err.message} — skipping`);
+      failed++;
+    }
     done.add(s.handle);
-    added++;
+    await writeFile(OUT, JSON.stringify(results, null, 2));
+    await sleep(delayMs);
   }
-  await writeFile(OUT, JSON.stringify(results, null, 2));
-  console.log(`Saved ${added} new suspects to ${OUT}.`);
-  console.log("Run: node collect_fake_persons.mjs <handle> --force   to score each one.");
+  console.log(`\nDone. ${added} saved and scored, ${failed} failed. Results in ${OUT}`);
 }
