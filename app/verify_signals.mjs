@@ -48,7 +48,7 @@ const PAIRS = [
   ["pf", "postsPerDay", P, "postsPerDay", 0.03], ["pf", "followers", P, "followers", 0], ["pf", "follows", P, "follows", 0],
   ["pf", "handleDigitShare", P, "handleDigitShare", 0], ["pf", "hasDisplayName", P, "hasDisplayName", 0], ["pf", "hasBanner", P, "hasBanner", 0],
   ...["itemsPerDay", "gapCV", "sameGapShare", "minuteModeShare", "secondModeShare", "repostShare", "replyShare", "quoteShare", "zeroEngagementShare", "engagementPerFollower", "templateShare", "meanSimilarity", "exactDupShare", "textLength", "languages", "linkShare", "imageShare"].map((n) => ["bh", n, B, n, 0]),
-  ...["sampleFollowers", "mutualOfFollowers", "followerBotShare", "followerEmptyShare", "followerNoAvatarShare", "followerAgeMedianDays", "followerDayModeShare", "followsBotShare"].map((n) => ["gr", n, G, n, n === "followerAgeMedianDays" ? 0.03 : 0]),
+  ...["sampleFollowers", "mutualOfFollowers", "followerBotShare", "followerEmptyShare", "followerNoAvatarShare", "followerAgeMedianDays", "followerDayModeShare", "followsBotShare", "followerCluster", "followerSampleBotFollowShare"].map((n) => ["gr", n, G, n, n === "followerAgeMedianDays" ? 0.03 : 0]),
   ...["ttr100", "lengthCV", "digitCharShare", "headlineLinkShare", "charSimilarity", "nearDupShare"].map((n) => ["ct", n, C, n, 0]),
 ];
 const stats = new Map(PAIRS.map((p) => [`${p[0]}.${p[1]}`, { n: 0, bad: 0, nanMismatch: 0, maxDiff: 0, example: "" }]));

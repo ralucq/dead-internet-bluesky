@@ -35,6 +35,8 @@ const L = {
   logFollowerAge: ["Typical age of followers' accounts in days", (x) => num(Math.expm1(x))],
   followerDayModeShare: ["Followers who joined on the same day", pct],
   followsBotShare: ["Accounts it follows that are labelled bots", pct],
+  followerCluster: ["Followers who follow each other (bot-farm clustering)", (x) => pct(x)],
+  followerSampleBotFollowShare: ["Bots in the networks of its followers", pct],
   logSampleFollowers: ["Followers found (up to 100)", (x) => num(Math.expm1(x))],
   ttr100: ["Word variety", (x) => x.toFixed(2)],
   lengthCV: ["Variation in post length", (x) => x.toFixed(2)],
@@ -85,7 +87,7 @@ function render(profile, items, graph, res) {
     ? "<b>Important:</b> this measures scheduled, repetitive, one-way posting, the way declared feed bots behave. It cannot see fake-person or AI-run accounts that post and interact like people (for example accounts with stolen or generated photos). A low result does not mean the account is a real person."
     : "The score compares this account with declared bots (mostly scheduled feed accounts). It cannot see AI-driven accounts that behave like people.");
   $("out").innerHTML = `<div class="card">
-    <div class="who">${profile.avatar ? `<img src="${esc(profile.avatar)}" alt="">` : "<img alt=''>"}<div><b>${esc(profile.displayName || profile.handle)}</b><span>@${esc(profile.handle)}</span></div></div>
+    <div class="who">${profile.avatar ? `<div class="who-pic"><img src="${esc(profile.avatar)}" alt=""><div class="rev-img-search"><span>Reverse image:</span><a href="https://lens.google.com/uploadbyurl?url=${encodeURIComponent(profile.avatar)}" target="_blank" rel="noopener">Lens</a><a href="https://tineye.com/search?url=${encodeURIComponent(profile.avatar)}" target="_blank" rel="noopener">TinEye</a><a href="https://yandex.com/images/search?source=collections&url=${encodeURIComponent(profile.avatar)}" target="_blank" rel="noopener">Yandex</a></div></div>` : "<img alt=''>"}<div><b>${esc(profile.displayName || profile.handle)}</b><span>@${esc(profile.handle)}</span></div></div>
     <div class="verdict" style="--c:var(${COLORS[k]})"><div class="big">${esc(title)}</div><div>${esc(text)}</div></div>
     <div class="scale" aria-hidden="true">${model.bands.map((_, i) => `<i class="${i === k ? "on" : ""}" style="background:var(${COLORS[i]})"></i>`).join("")}</div>
     <div class="mute">Score ${res.score.toFixed(0)} of 100 &middot; band &ldquo;${esc(band.name)}&rdquo;. In the study, ${sb} of 100 declared bots and ${sc} of 100 ordinary accounts fell in this band (evidence ratio ${band.ratio.toFixed(band.ratio >= 10 ? 0 : 1)}).</div>

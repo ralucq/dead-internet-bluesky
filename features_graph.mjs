@@ -84,6 +84,8 @@ const FEATURES = [
   ["followsAgeMedianDays", "median age in days of the accounts it follows"],
   ["followsEmptyShare", "share of followed accounts with no picture, no name and no bio"],
   ["followsBotShare", "share of followed accounts that carry the bot self-label"],
+  ["followerCluster", "average fraction of the account's sampled followers that each sampled follower also follows (follower-to-follower clustering; needs collect_follower_sample.mjs)"],
+  ["followerSampleBotFollowShare", "share of bot-labelled accounts among all accounts followed by the sampled followers (bot neighbourhood density)"],
 ];
 
 const median = (a) => { const s = [...a].sort((x, y) => x - y); return s.length ? s[Math.floor(s.length / 2)] : NaN; };
@@ -123,6 +125,33 @@ function featuresOf(g, p) {
     if (p.followers <= 100) {
       const followers = new Set(F.map((a) => a.d));
       f.mutualOfFollows = share(G, (a) => followers.has(a.d));
+    }
+  }
+  // Follower clustering: do an account's followers follow each other? (bot-farm pattern)
+  // Requires followerSample added by collect_follower_sample.mjs.
+  const S = g.followerSample;
+  if (S && S.length >= 1) {
+    // Bot-neighbourhood: what fraction of accounts in followers' networks are labelled bots?
+    // (needs only 1 sampled follower)
+    let botFollows = 0, totalFollows = 0;
+    for (const s of S) {
+      if (!s.follows || s.follows.length === 0) continue;
+      botFollows += s.follows.filter((a) => a.bot).length;
+      totalFollows += s.follows.length;
+    }
+    if (totalFollows > 0) f.followerSampleBotFollowShare = botFollows / totalFollows;
+    // Clustering: average fraction of followers that each sampled follower also follows.
+    // (needs 2+ sampled followers and 2+ followers so there are pairs to test)
+    if (S.length >= 2 && F.length >= 2) {
+      const followerDids = new Set(F.map((a) => a.d));
+      let clusterSum = 0, clusterCount = 0;
+      for (const s of S) {
+        if (!s.follows || s.follows.length === 0) continue;
+        const mutual = s.follows.filter((a) => followerDids.has(a.d) && a.d !== s.d).length;
+        const possible = followerDids.size - 1; // -1: exclude the sampled follower itself
+        if (possible > 0) { clusterSum += mutual / possible; clusterCount++; }
+      }
+      if (clusterCount >= 2) f.followerCluster = clusterSum / clusterCount;
     }
   }
   return f;

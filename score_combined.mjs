@@ -133,6 +133,8 @@ const SIGNALS = [
   ["graph", "followerDayModeShare", g("followerDayModeShare"), false],
   ["graph", "followsBotShare", g("followsBotShare"), true],
   ["graph", "logSampleFollowers", (r) => Math.log1p(g("sampleFollowers")(r)), true],
+  ["graph", "followerCluster", g("followerCluster"), false],
+  ["graph", "followerSampleBotFollowShare", g("followerSampleBotFollowShare"), false],
   ...(C
     ? [
         ["content", "ttr100", c("ttr100"), false],
