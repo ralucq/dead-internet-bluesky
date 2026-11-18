@@ -88,9 +88,7 @@ function breakdown(res) {
     const isBot = idx >= 4, isOrd = idx <= 2;
     const labelText = isBot ? "Bot-like" : isOrd ? "Ordinary" : "Mixed";
     const labelCls  = isBot ? "lbl-bot" : isOrd ? "lbl-ord" : "lbl-mix";
-    const catScale = `<div class="cat-scale" aria-hidden="true">${
-      COLORS.map((c, i) => `<i class="${i === idx ? "on" : ""}" style="background:var(${c})"></i>`).join("")
-    }</div>`;
+    const catScale = `<div class="cat-scale" aria-hidden="true"><div class="cat-marker" style="left:${(idx/6*100).toFixed(1)}%"></div></div>`;
     // Show the top 3 signals by absolute contribution.
     const top = [...parts].sort((a, b) => Math.abs(b.contribution) - Math.abs(a.contribution)).slice(0, 3);
     return `<div class="cat-card">
@@ -134,7 +132,7 @@ function render(profile, items, graph, res) {
     <div class="card-col">
       <div class="who"><img src="${profile.avatar ? esc(profile.avatar) : ""}" alt=""><div><b>${esc(profile.displayName || profile.handle)}</b><span>@${esc(profile.handle)}</span></div></div>
       <div class="verdict" style="--c:var(${COLORS[k]})"><div class="big">${esc(title)}</div><div>${esc(text)}</div></div>
-      <div class="scale" aria-hidden="true">${model.bands.map((_, i) => `<i class="${i === k ? "on" : ""}" style="background:var(${COLORS[i]})"></i>`).join("")}</div>
+      <div class="scale" aria-hidden="true"><div class="scale-marker" style="left:${(k/6*100).toFixed(1)}%"></div></div>
       <div class="mute">Score ${res.score.toFixed(0)} of 100 &middot; band &ldquo;${esc(band.name)}&rdquo;. In the study, ${sb} of 100 declared bots and ${sc} of 100 ordinary accounts fell in this band (evidence ratio ${band.ratio.toFixed(band.ratio >= 10 ? 0 : 1)}).</div>
       ${notes.map((n) => `<div class="note">${n}</div>`).join("")}
       ${moreChecks}
