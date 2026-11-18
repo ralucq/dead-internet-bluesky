@@ -72,10 +72,10 @@ try { model = await (await fetch("model.json")).json(); } catch { $("out").inner
 
 function showSignal(p) {
   const lab = L[p.signal]?.[0] ?? p.signal;
-  if (p.marker) return `<li><b>${esc(lab)}</b><div class="nums">Could not be measured for this account, which is itself informative.</div></li>`;
-  const j = model.signals.indexOf(p.signal), f = L[p.signal]?.[1] ?? String;
+  if (p.marker) return `<li><b>${esc(lab)}</b><div class="nums">Could not be measured for this account.</div></li>`;
+  const f = L[p.signal]?.[1] ?? String;
   const own = Number.isFinite(p.value) ? f(p.value) : "n/a";
-  return `<li><b>${esc(lab)}</b><div class="nums">this account: ${own} &middot; typical bot: ${f(model.refBots[j])} &middot; typical ordinary: ${f(model.refComparison[j])}</div></li>`;
+  return `<li><b>${esc(lab)}</b><div class="nums">${own}</div></li>`;
 }
 
 function breakdown(res) {
@@ -83,17 +83,14 @@ function breakdown(res) {
   return Object.entries(CAT).map(([cat, signals]) => {
     const parts = signals.map((s) => bySignal[s]).filter(Boolean);
     const net = parts.filter((p) => !p.marker).reduce((s, p) => s + p.contribution, 0);
-    // Direction: net > 0.5 → bot-like, net < -0.5 → ordinary, else mixed.
-    const isBot = net > 0.5, isOrd = net < -0.5;
+    // Map net contribution (capped ±3) to a band index 0–6, same scale as the main score.
+    const idx = Math.min(6, Math.max(0, Math.round((net + 3) / 6 * 6)));
+    const isBot = idx >= 4, isOrd = idx <= 2;
     const labelText = isBot ? "Bot-like" : isOrd ? "Ordinary" : "Mixed";
     const labelCls  = isBot ? "lbl-bot" : isOrd ? "lbl-ord" : "lbl-mix";
-    // Bar extends from the center; cap at ±3 for visual scaling.
-    const fillW = Math.min(100, Math.round(Math.abs(net) / 3 * 100));
-    const fill = isBot
-      ? `<div class="cat-fill-bot" style="width:${fillW}%"></div>`
-      : isOrd
-      ? `<div class="cat-fill-ord" style="width:${fillW}%"></div>`
-      : "";
+    const catScale = `<div class="cat-scale" aria-hidden="true">${
+      COLORS.map((c, i) => `<i class="${i === idx ? "on" : ""}" style="background:var(${c})"></i>`).join("")
+    }</div>`;
     // Show the top 3 signals by absolute contribution.
     const top = [...parts].sort((a, b) => Math.abs(b.contribution) - Math.abs(a.contribution)).slice(0, 3);
     return `<div class="cat-card">
@@ -101,7 +98,7 @@ function breakdown(res) {
         <span class="cat-name">${esc(cat)}</span>
         <span class="cat-lbl ${labelCls}">${labelText}</span>
       </div>
-      <div class="cat-bar">${fill}<div class="cat-mid"></div></div>
+      ${catScale}
       <ul class="r">${top.map(showSignal).join("")}</ul>
     </div>`;
   }).join("");
@@ -131,15 +128,6 @@ function render(profile, items, graph, res) {
           <a href="https://yandex.com/images/search?source=collections&url=${avatarUrl}" target="_blank" rel="noopener">Yandex</a>
         </div>
       </div>
-      <div class="check-row">
-        <span class="check-row-label">Is the photo AI-generated?</span>
-        <div class="check-links">
-          <a href="https://aiornot.com" target="_blank" rel="noopener" data-copy="${esc(profile.avatar)}">AI or Not</a>
-          <a href="https://illuminarty.ai" target="_blank" rel="noopener" data-copy="${esc(profile.avatar)}">Illuminarty</a>
-          <a href="https://isitai.com/ai-image-detector/" target="_blank" rel="noopener" data-copy="${esc(profile.avatar)}">Is It AI?</a>
-        </div>
-      </div>
-      <div class="check-hint">Clicking an AI-detection link copies the photo URL to your clipboard automatically &mdash; just paste it on the site.</div>
     </div>` : "";
 
   $("out").innerHTML = `<div class="card">
