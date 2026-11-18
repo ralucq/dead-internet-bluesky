@@ -45,6 +45,15 @@ const L = {
   charSimilarity: ["Similarity between posts (letters)", (x) => x.toFixed(2)],
   nearDupShare: ["Posts with a near-copy among its own posts", pct],
 };
+
+// Signal groupings for the per-category breakdown.
+const CAT = {
+  "Profile":      ["logFollowers","logFollows","handleDigitShare","hasDisplayName","hasBanner"],
+  "Timing":       ["logPostsPerDay","logItemsPerDay","gapCV","sameGapShare","minuteModeShare","secondModeShare"],
+  "Content":      ["repostShare","replyShare","quoteShare","zeroEngagementShare","logEngagementPerFollower","templateShare","meanSimilarity","exactDupShare","logTextLength","languages","linkShare","imageShare","ttr100","lengthCV","digitCharShare","headlineLinkShare","charSimilarity","nearDupShare"],
+  "Social graph": ["mutualOfFollowers","followerBotShare","followerEmptyShare","followerNoAvatarShare","logFollowerAge","followerDayModeShare","followsBotShare","followerCluster","followerSampleBotFollowShare","logSampleFollowers"],
+};
+
 const BAND_TEXT = {
   "very low": ["No sign of scheduled automation", "Its posting rhythm, repetition and connections look like the ordinary accounts of the study. This does NOT show that a real person runs it."],
   "low": ["Little sign of scheduled automation", "Mostly like the ordinary accounts of the study. This does NOT show that a real person runs it."],
@@ -61,17 +70,41 @@ const esc = (s) => String(s).replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<": "&l
 let model;
 try { model = await (await fetch("model.json")).json(); } catch { $("out").innerHTML = '<div class="card err">The model file (model.json) could not be loaded.</div>'; }
 
-function reasons(res) {
-  const show = (p) => {
-    const lab = L[p.signal]?.[0] ?? p.signal;
-    if (p.marker) return `<li><b>${esc(lab)}</b><div class="nums">Could not be measured for this account, which is itself informative.</div></li>`;
-    const j = model.signals.indexOf(p.signal), f = L[p.signal]?.[1] ?? String;
-    const own = Number.isFinite(p.value) ? f(p.value) : "n/a";
-    return `<li><b>${esc(lab)}</b><div class="nums">this account: ${own} &middot; typical declared bot: ${f(model.refBots[j])} &middot; typical ordinary account: ${f(model.refComparison[j])}</div></li>`;
-  };
-  const sorted = [...res.parts].sort((a, b) => b.contribution - a.contribution);
-  const up = sorted.filter((p) => p.contribution > 0.15).slice(0, 4), down = sorted.reverse().filter((p) => p.contribution < -0.15).slice(0, 4);
-  return `${up.length ? `<h2>What points towards a bot</h2><ul class="r">${up.map(show).join("")}</ul>` : ""}${down.length ? `<h2>What points towards an ordinary account</h2><ul class="r">${down.map(show).join("")}</ul>` : ""}`;
+function showSignal(p) {
+  const lab = L[p.signal]?.[0] ?? p.signal;
+  if (p.marker) return `<li><b>${esc(lab)}</b><div class="nums">Could not be measured for this account, which is itself informative.</div></li>`;
+  const j = model.signals.indexOf(p.signal), f = L[p.signal]?.[1] ?? String;
+  const own = Number.isFinite(p.value) ? f(p.value) : "n/a";
+  return `<li><b>${esc(lab)}</b><div class="nums">this account: ${own} &middot; typical bot: ${f(model.refBots[j])} &middot; typical ordinary: ${f(model.refComparison[j])}</div></li>`;
+}
+
+function breakdown(res) {
+  const bySignal = Object.fromEntries(res.parts.map((p) => [p.signal, p]));
+  return Object.entries(CAT).map(([cat, signals]) => {
+    const parts = signals.map((s) => bySignal[s]).filter(Boolean);
+    const net = parts.filter((p) => !p.marker).reduce((s, p) => s + p.contribution, 0);
+    // Direction: net > 0.5 → bot-like, net < -0.5 → ordinary, else mixed.
+    const isBot = net > 0.5, isOrd = net < -0.5;
+    const labelText = isBot ? "Bot-like" : isOrd ? "Ordinary" : "Mixed";
+    const labelCls  = isBot ? "lbl-bot" : isOrd ? "lbl-ord" : "lbl-mix";
+    // Bar extends from the center; cap at ±3 for visual scaling.
+    const fillW = Math.min(100, Math.round(Math.abs(net) / 3 * 100));
+    const fill = isBot
+      ? `<div class="cat-fill-bot" style="width:${fillW}%"></div>`
+      : isOrd
+      ? `<div class="cat-fill-ord" style="width:${fillW}%"></div>`
+      : "";
+    // Show the top 3 signals by absolute contribution.
+    const top = [...parts].sort((a, b) => Math.abs(b.contribution) - Math.abs(a.contribution)).slice(0, 3);
+    return `<div class="cat-card">
+      <div class="cat-head">
+        <span class="cat-name">${esc(cat)}</span>
+        <span class="cat-lbl ${labelCls}">${labelText}</span>
+      </div>
+      <div class="cat-bar">${fill}<div class="cat-mid"></div></div>
+      <ul class="r">${top.map(showSignal).join("")}</ul>
+    </div>`;
+  }).join("");
 }
 
 function render(profile, items, graph, res) {
@@ -108,14 +141,20 @@ function render(profile, items, graph, res) {
       </div>
       <div class="check-hint">Clicking an AI-detection link copies the photo URL to your clipboard automatically &mdash; just paste it on the site.</div>
     </div>` : "";
+
   $("out").innerHTML = `<div class="card">
-    <div class="who"><img src="${profile.avatar ? esc(profile.avatar) : ""}" alt=""><div><b>${esc(profile.displayName || profile.handle)}</b><span>@${esc(profile.handle)}</span></div></div>
-    <div class="verdict" style="--c:var(${COLORS[k]})"><div class="big">${esc(title)}</div><div>${esc(text)}</div></div>
-    <div class="scale" aria-hidden="true">${model.bands.map((_, i) => `<i class="${i === k ? "on" : ""}" style="background:var(${COLORS[i]})"></i>`).join("")}</div>
-    <div class="mute">Score ${res.score.toFixed(0)} of 100 &middot; band &ldquo;${esc(band.name)}&rdquo;. In the study, ${sb} of 100 declared bots and ${sc} of 100 ordinary accounts fell in this band (evidence ratio ${band.ratio.toFixed(band.ratio >= 10 ? 0 : 1)}).</div>
-    ${notes.map((n) => `<div class="note">${n}</div>`).join("")}
-    ${moreChecks}
-    ${reasons(res)}
+    <div class="card-col">
+      <div class="who"><img src="${profile.avatar ? esc(profile.avatar) : ""}" alt=""><div><b>${esc(profile.displayName || profile.handle)}</b><span>@${esc(profile.handle)}</span></div></div>
+      <div class="verdict" style="--c:var(${COLORS[k]})"><div class="big">${esc(title)}</div><div>${esc(text)}</div></div>
+      <div class="scale" aria-hidden="true">${model.bands.map((_, i) => `<i class="${i === k ? "on" : ""}" style="background:var(${COLORS[i]})"></i>`).join("")}</div>
+      <div class="mute">Score ${res.score.toFixed(0)} of 100 &middot; band &ldquo;${esc(band.name)}&rdquo;. In the study, ${sb} of 100 declared bots and ${sc} of 100 ordinary accounts fell in this band (evidence ratio ${band.ratio.toFixed(band.ratio >= 10 ? 0 : 1)}).</div>
+      ${notes.map((n) => `<div class="note">${n}</div>`).join("")}
+      ${moreChecks}
+    </div>
+    <div class="card-col card-col-right">
+      <div class="breakdown-title">Signal breakdown</div>
+      <div class="breakdown">${breakdown(res)}</div>
+    </div>
   </div>`;
 }
 
@@ -124,6 +163,7 @@ function normalize(input) {
   if (h && !h.startsWith("did:") && !h.includes(".")) h += ".bsky.social";
   return h;
 }
+
 document.addEventListener("click", (e) => {
   const link = e.target.closest("a[data-copy]");
   if (!link) return;
