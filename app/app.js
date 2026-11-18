@@ -70,14 +70,6 @@ const esc = (s) => String(s).replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<": "&l
 let model;
 try { model = await (await fetch("model.json")).json(); } catch { $("out").innerHTML = '<div class="card err">The model file (model.json) could not be loaded.</div>'; }
 
-function showSignal(p) {
-  const lab = L[p.signal]?.[0] ?? p.signal;
-  if (p.marker) return `<li><b>${esc(lab)}</b><div class="nums">Could not be measured for this account.</div></li>`;
-  const f = L[p.signal]?.[1] ?? String;
-  const own = Number.isFinite(p.value) ? f(p.value) : "n/a";
-  return `<li><b>${esc(lab)}</b><div class="nums">${own}</div></li>`;
-}
-
 function breakdown(res) {
   const bySignal = Object.fromEntries(res.parts.map((p) => [p.signal, p]));
   return Object.entries(CAT).map(([cat, signals]) => {
@@ -89,15 +81,12 @@ function breakdown(res) {
     const labelText = isBot ? "Bot-like" : isOrd ? "Ordinary" : "Mixed";
     const labelCls  = isBot ? "lbl-bot" : isOrd ? "lbl-ord" : "lbl-mix";
     const catScale = `<div class="cat-scale" aria-hidden="true"><div class="cat-marker" style="left:${(idx/6*100).toFixed(1)}%"></div></div>`;
-    // Show the top 3 signals by absolute contribution.
-    const top = [...parts].sort((a, b) => Math.abs(b.contribution) - Math.abs(a.contribution)).slice(0, 3);
     return `<div class="cat-card">
       <div class="cat-head">
         <span class="cat-name">${esc(cat)}</span>
         <span class="cat-lbl ${labelCls}">${labelText}</span>
       </div>
       ${catScale}
-      <ul class="r">${top.map(showSignal).join("")}</ul>
     </div>`;
   }).join("");
 }

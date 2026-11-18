@@ -17,12 +17,35 @@
 @media (prefers-color-scheme:dark){:root{--bg:#10151b;--card:#18202a;--ink:#e8edf2;--mute:#9aa8b6;--line:#2a3542;--accent:#7aa2ff;
 --b0:#4cc08f;--b1:#79c196;--b2:#a9c279;--b3:#dcc055;--b4:#eba24a;--b5:#ee7650;--b6:#e5566c}}
 *{box-sizing:border-box}
-body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.55 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif}
-main{max-width:1100px;margin:0 auto;padding:32px 16px 64px}
-h1{font-size:1.7rem;line-height:1.25;margin:0 0 6px}
-.sub{color:var(--mute);margin:0 0 24px}
+body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.6 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif}
+main{max-width:760px;margin:0 auto;padding:32px 16px 72px}
+h1{font-size:1.7rem;line-height:1.25;margin:0 0 10px}
+.lead{color:var(--mute);font-size:1.05rem;margin:0 0 44px;max-width:620px}
+h2{font-size:.8rem;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--mute);margin:40px 0 14px;padding-top:4px;border-top:1px solid var(--line)}
+p{margin:0 0 14px}
 a{color:var(--accent)}
-footer{color:var(--mute);font-size:.85rem;margin-top:28px}
+/* gradient scale demo */
+.scale-bar{position:relative;height:12px;border-radius:6px;background:linear-gradient(to right,var(--b0),var(--b1),var(--b2),var(--b3),var(--b4),var(--b5),var(--b6));margin:4px 0 6px}
+.scale-ends{display:flex;justify-content:space-between;font-size:.78rem;color:var(--mute);margin-bottom:20px}
+/* band cards */
+.band-list{display:flex;flex-direction:column;gap:6px;margin-top:4px}
+.band-row{display:grid;grid-template-columns:12px 1fr;gap:12px;align-items:start;background:var(--card);border:1px solid var(--line);border-radius:8px;padding:11px 14px}
+.band-dot{width:12px;height:12px;border-radius:50%;margin-top:3px}
+.band-label{font-weight:700;font-size:.93rem;margin-bottom:1px}
+.band-desc{color:var(--mute);font-size:.87rem}
+/* category cards */
+.cat-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:4px}
+@media(max-width:560px){.cat-grid{grid-template-columns:1fr}}
+.cat-block{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:16px}
+.cat-block-name{font-size:.75rem;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--mute);margin-bottom:8px}
+.cat-block-desc{font-size:.9rem;margin:0 0 10px;line-height:1.5}
+.cat-block ul{margin:0;padding-left:16px;font-size:.85rem;color:var(--mute);line-height:1.6}
+/* limitation box */
+.note{background:color-mix(in srgb,var(--b4) 10%,transparent);border:1px solid color-mix(in srgb,var(--b4) 30%,transparent);border-radius:10px;padding:14px 16px;font-size:.92rem;margin:14px 0}
+.note p{margin:0 0 8px}
+.note p:last-child{margin:0}
+.note ul{margin:8px 0 0;padding-left:18px;font-size:.88rem;color:var(--mute);line-height:1.65}
+footer{color:var(--mute);font-size:.85rem;margin-top:28px;border-top:1px solid var(--line);padding-top:16px}
 </style>
 </head>
 <body>
@@ -39,7 +62,101 @@ footer{color:var(--mute);font-size:.85rem;margin-top:28px}
 </nav>
 <main>
   <h1>How to read the Bot Checker results</h1>
-  <p class="sub">What the score means, what it cannot tell you, and how to use the signal breakdown.</p>
+  <p class="lead">The Bot Checker gives every Bluesky account a score and four category readings. This page explains what they mean, how they are calculated, and — just as importantly — what they cannot tell you.</p>
+
+  <h2>The score</h2>
+  <p>The score goes from <strong>0 to 100</strong>. It shows how similar an account's behaviour is to a group of 598 Bluesky accounts that openly call themselves bots — compared with 581 ordinary accounts. The higher the score, the more the account looks like those declared bots.</p>
+  <p>The comparison group of bots consists mostly of <em>scheduled feed accounts</em>: accounts that automatically post news headlines, sports results, weather updates, and similar content on a fixed timetable. The score is best understood as a measure of similarity to this specific type of automation.</p>
+  <div class="scale-bar"></div>
+  <div class="scale-ends"><span>0 — looks like ordinary accounts</span><span>100 — looks like declared bots</span></div>
+
+  <h2>The seven result bands</h2>
+  <p>The score is grouped into seven bands. Each band corresponds to how much the evidence tilts towards bots or ordinary accounts.</p>
+  <div class="band-list">
+    <div class="band-row">
+      <div class="band-dot" style="background:var(--b0)"></div>
+      <div><div class="band-label">No sign of scheduled automation</div><div class="band-desc">The account's behaviour matches the ordinary accounts in the study on almost every measure.</div></div>
+    </div>
+    <div class="band-row">
+      <div class="band-dot" style="background:var(--b1)"></div>
+      <div><div class="band-label">Little sign of scheduled automation</div><div class="band-desc">The account mostly looks like the ordinary group, with a few measurements leaning bot-like.</div></div>
+    </div>
+    <div class="band-row">
+      <div class="band-dot" style="background:var(--b2)"></div>
+      <div><div class="band-label">Slightly more like ordinary accounts</div><div class="band-desc">A mixed picture that leans towards ordinary, but not by a wide margin.</div></div>
+    </div>
+    <div class="band-row">
+      <div class="band-dot" style="background:var(--b3)"></div>
+      <div><div class="band-label">Unclear</div><div class="band-desc">The measurements do not clearly separate this account from either group. Both interpretations are possible.</div></div>
+    </div>
+    <div class="band-row">
+      <div class="band-dot" style="background:var(--b4)"></div>
+      <div><div class="band-label">Some sign of automation</div><div class="band-desc">More measurements point towards the declared bots than the ordinary accounts, but the evidence is not decisive.</div></div>
+    </div>
+    <div class="band-row">
+      <div class="band-dot" style="background:var(--b5)"></div>
+      <div><div class="band-label">Strong sign of automation</div><div class="band-desc">The account looks very similar to the declared bots across most categories.</div></div>
+    </div>
+    <div class="band-row">
+      <div class="band-dot" style="background:var(--b6)"></div>
+      <div><div class="band-label">Very strong sign of automation</div><div class="band-desc">The account matches the declared bots in almost every measurement — the strongest possible signal.</div></div>
+    </div>
+  </div>
+
+  <h2>Four categories of signals</h2>
+  <p>The 37 individual measurements are grouped into four categories. Each category gets its own mini-scale so you can see at a glance which aspects of the account look bot-like and which look ordinary.</p>
+  <div class="cat-grid">
+    <div class="cat-block">
+      <div class="cat-block-name">Profile</div>
+      <p class="cat-block-desc">Basic facts about the account itself — how it was set up and what it looks like before you read any posts.</p>
+      <ul>
+        <li>Number of followers and accounts followed</li>
+        <li>Whether it has a display name and a banner image</li>
+        <li>How many digits are in the handle</li>
+      </ul>
+    </div>
+    <div class="cat-block">
+      <div class="cat-block-name">Timing</div>
+      <p class="cat-block-desc">When and how often the account posts — the rhythm that separates a scheduler from a person typing in real time.</p>
+      <ul>
+        <li>Posts per day since the account was created</li>
+        <li>How regular the gaps between posts are</li>
+        <li>Whether posts cluster at the same minute or second of the hour</li>
+      </ul>
+    </div>
+    <div class="cat-block">
+      <div class="cat-block-name">Content</div>
+      <p class="cat-block-desc">What the posts actually say — looking for the repetition and template-like structure common in automated feeds.</p>
+      <ul>
+        <li>How similar posts are to each other (by words and characters)</li>
+        <li>Share of reposts, replies, links, and images</li>
+        <li>Post length, word variety, and near-duplicate posts</li>
+      </ul>
+    </div>
+    <div class="cat-block">
+      <div class="cat-block-name">Social graph</div>
+      <p class="cat-block-desc">Who follows the account — bot farms often attract other bots, and their follower base looks different from ordinary accounts.</p>
+      <ul>
+        <li>Share of followers with empty or no-avatar profiles</li>
+        <li>Share of followers labelled as bots</li>
+        <li>How old the follower accounts are, and whether they cluster together</li>
+      </ul>
+    </div>
+  </div>
+
+  <h2>What this tool cannot tell you</h2>
+  <p>The declared bots used to train the checker mostly post automatically on a schedule — news, alerts, weather. The tool is well suited to detecting that specific pattern. It is <em>not</em> a general-purpose fake-account detector.</p>
+  <div class="note">
+    <p><strong>A low score does not mean the account is a real person.</strong> A fake-person account with a natural posting rhythm, varied content, and genuine-looking followers can score very low. This is a known and important limitation of the approach.</p>
+    <p><strong>A high score does not mean the account is a bot.</strong> Some ordinary accounts post on a strict schedule — for example, someone who shares one link every morning at the same time — and can look very similar to declared feed bots.</p>
+    <ul>
+      <li>Use the reverse image search on the profile picture alongside the score.</li>
+      <li>Read a few posts and judge the content yourself.</li>
+      <li>Treat the score as one piece of evidence, not a final verdict.</li>
+      <li>Never use this result to publicly accuse a person of running a bot.</li>
+    </ul>
+  </div>
+
   <footer>Master's thesis: Dead Internet Theory, an analysis of behavior and social connections among Bluesky accounts.</footer>
 </main>
 </body>
