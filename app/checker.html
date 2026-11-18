@@ -3,10 +3,11 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Bot Checker · Is anyone there?</title>
+<title>Bot Checker · Is Anyone There?</title>
 <meta name="description" content="Compares a Bluesky account with declared bots and ordinary accounts. Part of a master's thesis on the Dead Internet Theory.">
 <style>
-.sitenav{background:var(--card);border-bottom:1px solid var(--line);padding:0 16px;position:sticky;top:0;z-index:10;display:flex;align-items:center}
+.sitenav{background:var(--card);border-bottom:1px solid var(--line);position:sticky;top:0;z-index:10}
+.sitenav-inner{max-width:1100px;margin:0 auto;padding:0 16px;display:flex;align-items:center}
 .sitenav-brand{font-weight:700;color:var(--ink);text-decoration:none;padding:13px 20px 13px 0;white-space:nowrap;font-size:1.05rem}
 .sitenav-links{display:flex;flex-wrap:wrap}
 .sitenav-links a{color:var(--mute);text-decoration:none;padding:13px 12px;font-size:.9rem;border-bottom:3px solid transparent;white-space:nowrap}
@@ -72,16 +73,18 @@ a{color:var(--accent)}
 </head>
 <body>
 <nav class="sitenav">
-  <a class="sitenav-brand" href="index.html">Is anyone there?</a>
-  <div class="sitenav-links">
-    <a href="theory.html">What is Dead Internet Theory?</a>
-    <a href="checker.html" class="active">Bot Checker</a>
-    <a href="guide.html">How to read the Bot Checker results</a>
-    <a href="game.html">Game: Can you spot the bot?</a>
+  <div class="sitenav-inner">
+    <a class="sitenav-brand" href="index.html">Is Anyone There?</a>
+    <div class="sitenav-links">
+      <a href="theory.html">What is Dead Internet Theory?</a>
+      <a href="checker.html" class="active">Bot Checker</a>
+      <a href="guide.html">How to read the Bot Checker results</a>
+      <a href="game.html">Game: Can you spot the bot?</a>
+    </div>
   </div>
 </nav>
 <main>
-  <h1>Is anyone there?</h1>
+  <h1>Is Anyone There?</h1>
   <p class="sub">Enter a Bluesky handle. The page compares the account with declared bots and ordinary accounts from a study on the Dead Internet Theory.</p>
   <form id="f">
     <input id="h" placeholder="name.bsky.social" autocomplete="off" spellcheck="false" aria-label="Bluesky handle">
