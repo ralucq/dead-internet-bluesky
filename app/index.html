@@ -3,6 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
+<script>(function(){var t;try{t=localStorage.getItem('theme')}catch(e){}if(t)document.documentElement.setAttribute('data-theme',t)})();</script>
 <title>Is Anyone There? Bluesky bot detection</title>
 <meta name="description" content="A research tool for detecting bot-like accounts on Bluesky. Part of a master's thesis on the Dead Internet Theory.">
 <style>
@@ -15,8 +16,12 @@
 .sitenav-links a.active{color:var(--accent);font-weight:600;border-bottom-color:var(--accent)}
 :root{--bg:#f6f7f9;--card:#fff;--ink:#16202b;--mute:#5d6b7a;--line:#dfe4ea;--accent:#2a5bd7;
 --b0:#2f8f6b;--b1:#5aa07a;--b2:#8aa05a;--b3:#c1a13b;--b4:#d98a2b;--b5:#d1552f;--b6:#b3263b}
-@media (prefers-color-scheme:dark){:root{--bg:#10151b;--card:#18202a;--ink:#e8edf2;--mute:#9aa8b6;--line:#2a3542;--accent:#7aa2ff;
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#10151b;--card:#18202a;--ink:#e8edf2;--mute:#9aa8b6;--line:#2a3542;--accent:#7aa2ff;
 --b0:#4cc08f;--b1:#79c196;--b2:#a9c279;--b3:#dcc055;--b4:#eba24a;--b5:#ee7650;--b6:#e5566c}}
+:root[data-theme="dark"]{--bg:#10151b;--card:#18202a;--ink:#e8edf2;--mute:#9aa8b6;--line:#2a3542;--accent:#7aa2ff;
+--b0:#4cc08f;--b1:#79c196;--b2:#a9c279;--b3:#dcc055;--b4:#eba24a;--b5:#ee7650;--b6:#e5566c}
+.theme-toggle{background:none;border:1px solid var(--line);border-radius:6px;padding:5px 7px;cursor:pointer;color:var(--mute);line-height:0;margin-left:auto;display:flex;align-items:center}
+.theme-toggle:hover{color:var(--ink);border-color:var(--mute)}
 *{box-sizing:border-box}
 body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.55 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif}
 main{max-width:1100px;margin:0 auto;padding:32px 16px 64px}
@@ -36,6 +41,7 @@ footer{color:var(--mute);font-size:.85rem;margin-top:28px}
     <a href="guide.html">How to read the Bot Checker results</a>
     <a href="game.html">Game: Can you spot the bot?</a>
   </div>
+  <button class="theme-toggle" id="theme-btn" onclick="toggleTheme()"></button>
   </div>
 </nav>
 <main>
@@ -43,5 +49,6 @@ footer{color:var(--mute);font-size:.85rem;margin-top:28px}
   <p class="sub">A research project on bot-like accounts on Bluesky, part of a master's thesis on the Dead Internet Theory.</p>
   <footer>Master's thesis: Dead Internet Theory, an analysis of behavior and social connections among Bluesky accounts.</footer>
 </main>
+<script src="theme.js"></script>
 </body>
 </html>
