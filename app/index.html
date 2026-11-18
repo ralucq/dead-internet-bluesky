@@ -3,8 +3,8 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Is anyone there? Bluesky bot check</title>
-<meta name="description" content="Compares a Bluesky account with declared bots and ordinary accounts. Part of a master's thesis on the Dead Internet Theory.">
+<title>Is anyone there? Bluesky bot detection</title>
+<meta name="description" content="A research tool for detecting bot-like accounts on Bluesky. Part of a master's thesis on the Dead Internet Theory.">
 <style>
 .sitenav{background:var(--card);border-bottom:1px solid var(--line);padding:0 16px;position:sticky;top:0;z-index:10;display:flex;align-items:center}
 .sitenav-brand{font-weight:700;color:var(--ink);text-decoration:none;padding:13px 20px 13px 0;white-space:nowrap;font-size:1.05rem}
@@ -21,80 +21,24 @@ body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.55 system-ui,-ap
 main{max-width:1100px;margin:0 auto;padding:32px 16px 64px}
 h1{font-size:1.7rem;line-height:1.25;margin:0 0 6px}
 .sub{color:var(--mute);margin:0 0 24px}
-form{display:flex;gap:8px;flex-wrap:wrap}
-input{flex:1 1 260px;font:inherit;padding:12px 14px;border:1px solid var(--line);border-radius:10px;background:var(--card);color:var(--ink)}
-button{font:inherit;font-weight:600;padding:12px 20px;border:0;border-radius:10px;background:var(--accent);color:#fff;cursor:pointer}
-button:disabled{opacity:.6;cursor:wait}
-.card{background:var(--card);border:1px solid var(--line);border-radius:14px;margin-top:18px;overflow:hidden;display:grid;grid-template-columns:1fr}
-@media(min-width:800px){.card{grid-template-columns:380px 1fr}}
-.card-col{padding:20px}
-.card-col-right{border-top:1px solid var(--line)}
-@media(min-width:800px){.card-col-right{border-top:0;border-left:1px solid var(--line)}}
-.breakdown-title{font-size:.8rem;font-weight:700;color:var(--mute);text-transform:uppercase;letter-spacing:.06em;margin-bottom:12px}
-.breakdown{display:grid;grid-template-columns:1fr 1fr;gap:12px}
-@media(max-width:560px){.breakdown{grid-template-columns:1fr}}
-.cat-card{border:1px solid var(--line);border-radius:10px;padding:12px}
-.cat-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:6px}
-.cat-name{font-size:.78rem;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--mute)}
-.cat-lbl{font-size:.72rem;padding:2px 7px;border-radius:4px;font-weight:600;white-space:nowrap}
-.lbl-bot{background:color-mix(in srgb,var(--b5) 15%,transparent);color:var(--b5)}
-.lbl-ord{background:color-mix(in srgb,var(--b0) 15%,transparent);color:var(--b0)}
-.lbl-mix{background:color-mix(in srgb,var(--mute) 15%,transparent);color:var(--mute)}
-.cat-scale{position:relative;height:8px;border-radius:4px;background:linear-gradient(to right,var(--b0),var(--b1),var(--b2),var(--b3),var(--b4),var(--b5),var(--b6));margin:4px 0 10px}
-.cat-marker{position:absolute;top:50%;transform:translate(-50%,-50%);width:11px;height:11px;border-radius:50%;background:var(--card);border:2.5px solid var(--ink);box-shadow:0 1px 4px rgba(0,0,0,.3)}
-.who{display:flex;gap:12px;align-items:center;margin-bottom:6px}
-.who img{width:48px;height:48px;border-radius:50%;background:var(--line)}
-.more-checks{margin-top:16px;border-top:1px solid var(--line);padding-top:14px}
-.more-checks-title{font-size:.8rem;font-weight:700;color:var(--mute);text-transform:uppercase;letter-spacing:.06em;margin-bottom:10px}
-.check-row{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:8px}
-.check-row-label{font-size:.88rem;color:var(--ink);min-width:170px}
-.check-links{display:flex;gap:5px;flex-wrap:wrap}
-.check-links a{font-size:.82rem;padding:3px 9px;border:1px solid var(--line);border-radius:6px;color:var(--accent);text-decoration:none;white-space:nowrap}
-.check-links a:hover{background:color-mix(in srgb,var(--accent) 10%,transparent)}
-.check-hint{font-size:.78rem;color:var(--mute);margin-top:4px}
-.who b{display:block}.who span{color:var(--mute);font-size:.9rem}
-.verdict{border-left:6px solid var(--c);padding:6px 0 6px 14px;margin:14px 0}
-.verdict .big{font-size:1.5rem;font-weight:700;color:var(--c)}
-.scale{position:relative;height:10px;border-radius:5px;background:linear-gradient(to right,var(--b0),var(--b1),var(--b2),var(--b3),var(--b4),var(--b5),var(--b6));margin:14px 0 4px}
-.scale-marker{position:absolute;top:50%;transform:translate(-50%,-50%);width:14px;height:14px;border-radius:50%;background:var(--card);border:2.5px solid var(--ink);box-shadow:0 1px 4px rgba(0,0,0,.3)}
-.mute{color:var(--mute);font-size:.92rem}
-h2{font-size:1.05rem;margin:22px 0 8px}
-ul.r{list-style:none;padding:0;margin:0}
-ul.r li{padding:10px 0;border-top:1px solid var(--line)}
-ul.r li:first-child{border-top:0}
-.nums{color:var(--mute);font-size:.88rem}
-.note{background:color-mix(in srgb,var(--accent) 10%,transparent);border-radius:10px;padding:12px 14px;margin-top:14px;font-size:.93rem}
-.err{color:var(--b6)}
-details{margin-top:18px}summary{cursor:pointer;font-weight:600}
-footer{color:var(--mute);font-size:.85rem;margin-top:28px}
 a{color:var(--accent)}
+footer{color:var(--mute);font-size:.85rem;margin-top:28px}
 </style>
 </head>
 <body>
 <nav class="sitenav">
   <a class="sitenav-brand" href="index.html">Is anyone there?</a>
   <div class="sitenav-links">
-    <a href="index.html" class="active">Bot Check</a>
-    <a href="theory.html">Dead Internet Theory</a>
-    <a href="guide.html">How to Read Results</a>
-    <a href="game.html">The Game</a>
+    <a href="theory.html">What is Dead Internet Theory?</a>
+    <a href="checker.html">Bot Checker</a>
+    <a href="guide.html">How to read the Bot Checker results</a>
+    <a href="game.html">Game: Can you spot the bot?</a>
   </div>
 </nav>
 <main>
   <h1>Is anyone there?</h1>
-  <p class="sub">Enter a Bluesky handle. The page compares the account with declared bots and ordinary accounts from a study on the Dead Internet Theory.</p>
-  <form id="f">
-    <input id="h" placeholder="name.bsky.social" autocomplete="off" spellcheck="false" aria-label="Bluesky handle">
-    <button id="go">Check</button>
-  </form>
-  <div id="out" aria-live="polite"></div>
-  <details>
-    <summary>How this works, and what it cannot tell you</summary>
-    <p class="mute">The page reads the account's public profile, its latest 100 posts, replies and reposts, and up to 100 followers and 100 followed accounts. It turns them into 37 measurements (timing, repetition, replies, followers and so on) and compares them with 598 accounts that call themselves bots and 580 ordinary accounts. Everything is computed in your browser. Nothing is stored and nothing is sent anywhere except to Bluesky's public API.</p>
-    <p class="mute">The result is a level of evidence, not a verdict. It measures how much the account looks like the declared bots of the study, which are mostly scheduled feed accounts (news, weather, alerts). It cannot see AI-driven or fake-person accounts that behave like people and do not say what they are. An ordinary account can also look like a bot (for example one that posts only links on a schedule). Never use the result to accuse a person.</p>
-  </details>
+  <p class="sub">A research project on bot-like accounts on Bluesky, part of a master's thesis on the Dead Internet Theory.</p>
   <footer>Master's thesis: Dead Internet Theory, an analysis of behavior and social connections among Bluesky accounts.</footer>
 </main>
-<script type="module" src="app.js"></script>
 </body>
 </html>
