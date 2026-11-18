@@ -27,8 +27,26 @@ body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.55 system-ui,-ap
 main{max-width:1100px;margin:0 auto;padding:32px 16px 64px}
 h1{font-size:1.7rem;line-height:1.25;margin:0 0 6px}
 .sub{color:var(--mute);margin:0 0 24px}
+h2{font-size:.8rem;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--mute);margin:40px 0 14px;padding-top:4px;border-top:1px solid var(--line)}
+p{margin:0 0 14px}
 a{color:var(--accent)}
-footer{color:var(--mute);font-size:.85rem;margin-top:28px}
+.lead{font-size:1.1rem;color:var(--mute);margin:0 0 40px;max-width:680px;line-height:1.65}
+/* stat row */
+.stats{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin:0 0 44px}
+@media(max-width:600px){.stats{grid-template-columns:repeat(2,1fr)}}
+.stat{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:16px}
+.stat-n{font-size:1.8rem;font-weight:700;color:var(--ink);line-height:1}
+.stat-l{font-size:.82rem;color:var(--mute);margin-top:4px}
+/* two-col layout */
+.cols{display:grid;grid-template-columns:1fr 1fr;gap:28px;margin-top:4px}
+@media(max-width:680px){.cols{grid-template-columns:1fr}}
+/* CTA card */
+.cta{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:24px 28px;display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap;margin:40px 0 0}
+.cta-text b{display:block;font-size:1.1rem;margin-bottom:4px}
+.cta-text span{font-size:.92rem;color:var(--mute)}
+.cta-btn{display:inline-block;background:var(--accent);color:#fff;text-decoration:none;font-weight:600;padding:11px 22px;border-radius:10px;white-space:nowrap;font-size:.95rem}
+.cta-btn:hover{opacity:.9}
+footer{color:var(--mute);font-size:.85rem;margin-top:40px;border-top:1px solid var(--line);padding-top:16px}
 </style>
 </head>
 <body>
@@ -46,7 +64,56 @@ footer{color:var(--mute);font-size:.85rem;margin-top:28px}
 </nav>
 <main>
   <h1>Is Anyone There?</h1>
-  <p class="sub">A research project on bot-like accounts on Bluesky, part of a master's thesis on the Dead Internet Theory.</p>
+  <p class="lead">A master's thesis project investigating how much of Bluesky's activity comes from automated accounts — and whether the claims of Dead Internet Theory hold up to measurement.</p>
+
+  <div class="stats">
+    <div class="stat"><div class="stat-n">598</div><div class="stat-l">declared bot accounts in the study</div></div>
+    <div class="stat"><div class="stat-n">581</div><div class="stat-l">ordinary accounts in the study</div></div>
+    <div class="stat"><div class="stat-n">37</div><div class="stat-l">behavioural signals measured</div></div>
+    <div class="stat"><div class="stat-n">4</div><div class="stat-l">signal categories</div></div>
+  </div>
+
+  <h2>The theory</h2>
+  <div class="cols">
+    <div>
+      <p>Dead Internet Theory is the idea that a large and growing share of online activity is no longer driven by real people. Bots, automated scripts and AI-generated content have, according to the theory, quietly taken over much of what we experience as the internet — filling feeds, inflating engagement counts and crowding out genuine human interaction.</p>
+      <p>The theory circulates mostly as speculation, but it points at something worth measuring: how much of a given platform is actually automated, and can that be detected from the outside?</p>
+    </div>
+    <div>
+      <p>This project picks Bluesky as its case study. Bluesky is a newer social platform with a fully open public API, which makes it possible to collect the data needed for a systematic study without needing special access.</p>
+      <p>Many Bluesky accounts openly label themselves as bots — news feeds, weather alerts, sports scores. That honesty makes them useful: they form a ground-truth group of real, confirmed automation that can be compared against ordinary accounts.</p>
+    </div>
+  </div>
+
+  <h2>Why this topic</h2>
+  <div class="cols">
+    <div>
+      <p>The question of how much online activity is genuinely human has become harder to ignore as AI-generated content grows. I wanted to approach it empirically rather than speculatively — to build a tool that makes actual measurements instead of relying on intuition or anecdote.</p>
+    </div>
+    <div>
+      <p>Dead Internet Theory is easy to dismiss as a conspiracy theory, but the underlying concern — that bots distort what we see and how we interact online — is worth taking seriously. This project is an attempt to find out how well that concern can be quantified.</p>
+    </div>
+  </div>
+
+  <h2>What the bot checker measures</h2>
+  <div class="cols">
+    <div>
+      <p>The Bot Checker reads a Bluesky account's public data — its profile, up to 100 recent posts, and up to 100 followers — and turns that into 37 behavioural signals. Each signal describes one measurable aspect of how the account behaves: how often it posts, how regular its timing is, how similar its posts are to each other, and what kind of accounts follow it.</p>
+    </div>
+    <div>
+      <p>Those signals are grouped into four categories — Profile, Timing, Content, and Social graph — and compared against the study's bot and ordinary groups using a logistic regression model. The result is a score from 0 to 100 and a band label describing how much the account resembles the declared bots.</p>
+      <p>Everything runs in your browser. No data is stored or sent anywhere except to Bluesky's public API.</p>
+    </div>
+  </div>
+
+  <div class="cta">
+    <div class="cta-text">
+      <b>Try the Bot Checker</b>
+      <span>Enter any Bluesky handle to see how it scores against the study's bot and ordinary groups.</span>
+    </div>
+    <a href="checker.html" class="cta-btn">Open Bot Checker</a>
+  </div>
+
   <footer>Master's thesis: Dead Internet Theory, an analysis of behavior and social connections among Bluesky accounts.</footer>
 </main>
 <script src="theme.js"></script>
