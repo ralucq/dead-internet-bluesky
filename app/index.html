@@ -6,6 +6,12 @@
 <title>Is anyone there? Bluesky bot check</title>
 <meta name="description" content="Compares a Bluesky account with declared bots and ordinary accounts. Part of a master's thesis on the Dead Internet Theory.">
 <style>
+.sitenav{background:var(--card);border-bottom:1px solid var(--line);padding:0 16px;position:sticky;top:0;z-index:10;display:flex;align-items:center}
+.sitenav-brand{font-weight:700;color:var(--ink);text-decoration:none;padding:13px 20px 13px 0;white-space:nowrap;font-size:1.05rem}
+.sitenav-links{display:flex;flex-wrap:wrap}
+.sitenav-links a{color:var(--mute);text-decoration:none;padding:13px 12px;font-size:.9rem;border-bottom:3px solid transparent;white-space:nowrap}
+.sitenav-links a:hover{color:var(--ink)}
+.sitenav-links a.active{color:var(--accent);font-weight:600;border-bottom-color:var(--accent)}
 :root{--bg:#f6f7f9;--card:#fff;--ink:#16202b;--mute:#5d6b7a;--line:#dfe4ea;--accent:#2a5bd7;
 --b0:#2f8f6b;--b1:#5aa07a;--b2:#8aa05a;--b3:#c1a13b;--b4:#d98a2b;--b5:#d1552f;--b6:#b3263b}
 @media (prefers-color-scheme:dark){:root{--bg:#10151b;--card:#18202a;--ink:#e8edf2;--mute:#9aa8b6;--line:#2a3542;--accent:#7aa2ff;
@@ -65,6 +71,15 @@ a{color:var(--accent)}
 </style>
 </head>
 <body>
+<nav class="sitenav">
+  <a class="sitenav-brand" href="index.html">Is anyone there?</a>
+  <div class="sitenav-links">
+    <a href="index.html" class="active">Bot Check</a>
+    <a href="theory.html">Dead Internet Theory</a>
+    <a href="guide.html">How to Read Results</a>
+    <a href="game.html">The Game</a>
+  </div>
+</nav>
 <main>
   <h1>Is anyone there?</h1>
   <p class="sub">Enter a Bluesky handle. The page compares the account with declared bots and ordinary accounts from a study on the Dead Internet Theory.</p>
